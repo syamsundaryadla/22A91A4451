@@ -150,7 +150,6 @@ def frame(t):
     ke = eo(pr(t, 13.0, 0.5)) * min(1, (DUR - t) / 0.3)
     if ke > 0:
         put(img, timg("JAI HANUMAN", F("cb", 100), GOLD, 4, glow=(255, 130, 10, 150)), W / 2, 1220, ke, 0.9 + 0.1 * eo(pr(t, 13.0, 0.6)))
-        put(img, timg("Type 'Jai Hanuman' if he's with you", F("ms", 30), SOFT, 1), W / 2, 1360, eo(pr(t, 13.4, 0.5)) * min(1, (DUR - t) / 0.3))
     return img.convert("RGB")
 
 if PREVIEW:
