@@ -2,7 +2,7 @@
 import wave, os, sys
 import numpy as np
 D = os.path.dirname(os.path.abspath(__file__))
-SR = 44100; DUR = 14.3; N = int(SR * DUR)
+SR = 44100; DUR = 18.3; N = int(SR * DUR)
 rng = np.random.default_rng(9)
 L = np.zeros(N, np.float32); R = np.zeros(N, np.float32)
 def add(sig, at, g=1.0, pan=0.0):
@@ -53,18 +53,18 @@ def chord(fs, d):
     t = tt(d); s = sum(np.sin(2*np.pi*f*t + 0.3*np.sin(2*np.pi*5*t)) + 0.5*np.sin(2*np.pi*f*2.005*t) for f in fs)
     return s * np.minimum(1, t * 6) * np.minimum(1, (d - t) * 6) * 0.08
 
-BPM = 128; beat = 60 / BPM; bar = beat * 4
+BPM = 92.3; beat = 60 / BPM; bar = beat * 4
 prog_ = [(55.0, [220.0, 261.6, 329.6]), (43.65, [174.6, 220.0, 261.6]), (65.4, [196.0, 261.6, 329.6]), (49.0, [196.0, 246.9, 293.7])]
-DROP_OUT = [(9.5, 10.0)]   # breakdown for drumroll
+DROP_OUT = [(11.7, 13.1)]   # breakdown for drumroll
 def muted(x): return any(a <= x < b for a, b in DROP_OUT)
 t0 = 0.0; b = 0
-while t0 < 14.0:
+while t0 < 18.0:
     root, ch = prog_[b % 4]
     if not muted(t0): add(chord(ch, bar), t0, 0.9)
     for q in range(4):
         x = t0 + q * beat
-        if x > 13.9 or muted(x): continue
-        intro = x < 1.5
+        if x > 17.9 or muted(x): continue
+        intro = x < 2.0
         if not intro: add(kick(), x, 0.9)
         if q in (1, 3) and not intro: add(clap(), x, 0.45, 0.1)
         add(hat(), x + beat / 2, 0.35, -0.3); add(hat(), x, 0.18, 0.3)
@@ -72,9 +72,9 @@ while t0 < 14.0:
     t0 += bar; b += 1
 
 # drumroll into #1
-x = 8.6
-while x < 9.45:
-    r = (x - 8.6) / 0.85; add(snare(), x, 0.25 + 0.5 * r, rng.uniform(-.2, .2)); x += 0.11 - 0.07 * r
+x = 11.7
+while x < 12.35:
+    r = (x - 11.7) / 0.65; add(snare(), x, 0.25 + 0.5 * r, rng.uniform(-.2, .2)); x += 0.11 - 0.07 * r
 mix = np.stack([L, R], 1)
 env = np.minimum(1, np.arange(N) / (SR * 0.5)) * np.minimum(1, (N - np.arange(N)) / (SR * 1.2))
 mix *= env[:, None]

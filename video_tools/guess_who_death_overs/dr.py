@@ -9,8 +9,8 @@ OUT = sys.argv[1]
 PREVIEW = [float(x) for x in sys.argv[2].split(",")] if len(sys.argv) > 2 else None
 W, H, FPS = 1080, 1920, 30
 BEAT = 0.5                                   # 120 bpm grid: every player lands on a bar
-T_HOOK, T_P = 0.0, [1.5, 3.5, 5.5, 7.5]      # #5..#2 start times
-T_ONE, T_PIN, DUR = 9.5, 12.5, 14.0
+T_HOOK, T_P = 0.0, [2.0, 4.6, 7.2, 9.8]      # #5..#2 start times
+T_ONE, T_PIN, DUR = 12.4, 15.9, 18.0
 WHITE = (255, 255, 255); GOLD = (255, 196, 40); MUTED = (200, 200, 215)
 LABEL = "OVERS 16–20  •  TILL IPL 2025"
 _F = {}
@@ -32,7 +32,7 @@ P = [  # rank, name, team, c1, c2, img, kind, runs, focus
  dict(rank=3, name="DINESH KARTHIK", team="ROYAL CHALLENGERS BENGALURU", c1=(213, 32, 39), c2=(212, 175, 55), img="KARTHIK.jpg", kind="photo", runs=1565, focus=(0.6, 0.15)),
  dict(rank=2, name="KIERON POLLARD", team="MUMBAI INDIANS", c1=(0, 90, 190), c2=(212, 175, 55), img="POLLARD.jpg", kind="photo", runs=1708, focus=(0.4, 0.12)),
 ]
-for p, t0 in zip(P, T_P): p["t0"] = t0; p["t1"] = t0 + 2.0
+for p, t0 in zip(P, T_P): p["t0"] = t0; p["t1"] = t0 + 2.6
 
 # ------------------------------------------------------------------ background
 yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
@@ -170,9 +170,9 @@ def mosaic():
 def hook(img, t):
     if t >= T_P[0] + 0.25: return
     out = 1 - pr(t, T_P[0] - 0.15, 0.3)
-    k1 = eo(pr(t, 0.0, 0.3)); k2 = eo(pr(t, 0.25, 0.3)); k3 = eo(pr(t, 0.55, 0.3))
-    put(img, timg("MOST RUNS IN", F("anton", 120), WHITE), W / 2, 760, k1 * out, 1.4 - 0.4 * back(pr(t, 0.0, 0.3)))
-    put(img, timg("DEATH OVERS", F("anton", 150), (0, 0, 0, 0), stroke=6, stroke_fill=GOLD, glow=(255, 140, 0, 130), shadow=False), W / 2, 920, k2 * out, 1.4 - 0.4 * back(pr(t, 0.25, 0.3)))
+    k1 = eo(pr(t, 0.0, 0.4)); k2 = eo(pr(t, 0.4, 0.4)); k3 = eo(pr(t, 0.8, 0.4))
+    put(img, timg("MOST RUNS IN", F("anton", 120), WHITE), W / 2, 760, k1 * out, 1.4 - 0.4 * back(pr(t, 0.0, 0.4)))
+    put(img, timg("DEATH OVERS", F("anton", 150), (0, 0, 0, 0), stroke=6, stroke_fill=GOLD, glow=(255, 140, 0, 130), shadow=False), W / 2, 920, k2 * out, 1.4 - 0.4 * back(pr(t, 0.4, 0.4)))
     put(img, timg("IPL HISTORY", F("mb", 66), WHITE, spacing=10), W / 2, 1075, k3 * out)
     put(img, timg(LABEL, F("mx", 26), MUTED, spacing=4, shadow=False), W / 2, 1150, k3 * out)
 
@@ -187,14 +187,14 @@ def player(img, t, p):
     else: put(img, pim, W / 2, 1150 - pim.height / 2 - drift, kp * out, 1.05 - 0.05 * kp)
     put(img, rrect(220, 70, 35, (*[int(v) for v in c1], 255)), W / 2, 185, min(1, kn * 2) * out, back(kn))
     put(img, timg(f"NO. {p['rank']}", F("mb", 36), (20, 20, 30) if p["rank"] == 4 else WHITE, spacing=4, shadow=False), W / 2, 185, min(1, kn * 2) * out, back(kn))
-    kname = eo(pr(t, p["t0"] + 0.15, 0.35))
+    kname = eo(pr(t, p["t0"] + 0.2, 0.45))
     put(img, timg(p["name"], F("anton", 104 if len(p["name"]) < 15 else 92), WHITE), W / 2, 1210 + (1 - kname) * 40, kname * out)
     put(img, timg(p["team"], F("mx", 28), tuple(int(v) for v in (c1 if p["rank"] != 4 else (250, 200, 20))), spacing=4), W / 2, 1295, kname * out)
-    kc = eo(pr(t, p["t0"] + 0.3, 0.35))
+    kc = eo(pr(t, p["t0"] + 0.4, 0.45))
     if kc > 0:
         card = rrect(560, 250, 30, (12, 14, 28, 220), (*[int(v) for v in c1], 255), 4)
         put(img, card, W / 2, 1530 + (1 - kc) * 60, kc * out)
-        v = int(round(p["runs"] * eo(pr(t, p["t0"] + 0.35, 0.9))))
+        v = int(round(p["runs"] * eo(pr(t, p["t0"] + 0.45, 1.3))))
         put(img, timg(f"{v:,}", F("anton", 140), WHITE), W / 2, 1550 + (1 - kc) * 60, kc * out)
         put(img, timg("DEATH-OVERS RUNS", F("mx", 24), MUTED, spacing=4, shadow=False), W / 2, 1450 + (1 - kc) * 60, kc * out)
 
@@ -206,28 +206,27 @@ def number_one(img, t):
     put(img, mo, W / 2, 650, eo(pr(t, T_ONE + 0.05, 0.5)), (1.06 - 0.06 * eo(pr(t, T_ONE, 0.6))) * pulse * 0.86)
     put(img, rrect(220, 70, 35, (255, 196, 40, 255)), W / 2, 185, k, back(pr(t, T_ONE, 0.35)))
     put(img, timg("NO. 1", F("mb", 36), (25, 15, 0), spacing=4, shadow=False), W / 2, 185, k, back(pr(t, T_ONE, 0.35)))
-    kq = pr(t, T_ONE + 0.5, 0.35)
+    kq = pr(t, T_ONE + 0.7, 0.4)
     put(img, timg("?", F("anton", 420), GOLD, glow=(0, 0, 0, 230)), W / 2, 660, kq, (0.6 + 0.4 * back(kq)) * (1 + 0.04 * math.sin(t * 6)))
-    kg = eo(pr(t, T_ONE + 0.9, 0.4))
+    kg = eo(pr(t, T_ONE + 1.2, 0.45))
     put(img, timg("GUESS WHO?", F("anton", 130), WHITE), W / 2, 1230 + (1 - kg) * 40, kg)
-    kc = eo(pr(t, T_ONE + 1.2, 0.35))
+    kc = eo(pr(t, T_ONE + 1.6, 0.4))
+    kc *= 1 - eio(pr(t, T_PIN - 0.1, 0.3))
     if kc > 0:
         put(img, rrect(560, 250, 30, (12, 14, 28, 220), (255, 196, 40, 255), 4), W / 2, 1530 + (1 - kc) * 60, kc)
         put(img, timg("DEATH-OVERS RUNS", F("mx", 24), MUTED, spacing=4, shadow=False), W / 2, 1450 + (1 - kc) * 60, kc)
         sc = "".join(random.Random(int(t * 12)).choice("0123456789") for _ in range(4)) if t < T_PIN - 0.8 else "????"
         put(img, timg(sc if t < T_PIN - 0.8 else "?,???", F("anton", 140), GOLD), W / 2, 1550 + (1 - kc) * 60, kc)
-    # pinned comment card
-    kp = eo(pr(t, T_PIN, 0.35))
+    # pinned comment card (bottom, replaces the runs card)
+    kp = eo(pr(t, T_PIN, 0.4))
     if kp > 0:
-        dim = Image.new("RGBA", (W, H), (0, 0, 0, int(150 * kp))); img.alpha_composite(dim)
-        card = rrect(880, 300, 40, (255, 255, 255, 245)); y = 960 + (1 - kp) * 80
-        put(img, card, W / 2, y, kp, 0.9 + 0.1 * back(pr(t, T_PIN, 0.35)))
-        # pin icon
-        pin = Image.new("RGBA", (120, 120), (0, 0, 0, 0)); pd = ImageDraw.Draw(pin)
-        pd.ellipse((30, 8, 90, 68), fill=(230, 40, 40, 255)); pd.polygon([(50, 60), (70, 60), (60, 112)], fill=(120, 120, 130, 255))
-        put(img, pin, W / 2, y - 80, kp, 0.9 + 0.1 * back(pr(t, T_PIN, 0.35)))
-        put(img, timg("ANSWER IN THE", F("mb", 46), (20, 20, 30), spacing=3, shadow=False), W / 2, y + 10, kp)
-        put(img, timg("PINNED COMMENT", F("anton", 80), (230, 40, 40), shadow=False), W / 2, y + 80, kp)
+        y = 1540 + (1 - kp) * 80; sc = 0.9 + 0.1 * back(pr(t, T_PIN, 0.4))
+        put(img, rrect(860, 230, 36, (255, 255, 255, 245)), W / 2, y, kp, sc)
+        pin = Image.new("RGBA", (110, 110), (0, 0, 0, 0)); pd = ImageDraw.Draw(pin)
+        pd.ellipse((28, 6, 82, 60), fill=(230, 40, 40, 255)); pd.polygon([(46, 54), (64, 54), (55, 104)], fill=(120, 120, 130, 255))
+        put(img, pin, W / 2 - 330, y, kp, sc)
+        put(img, timg("ANSWER IN THE", F("mb", 40), (20, 20, 30), spacing=3, shadow=False), W / 2 + 50, y - 38, kp, sc)
+        put(img, timg("PINNED COMMENT", F("anton", 76), (230, 40, 40), shadow=False), W / 2 + 50, y + 32, kp, sc)
 
 CUTS = T_P + [T_ONE]
 def wipe(img, t):
@@ -240,7 +239,7 @@ def wipe(img, t):
             d.polygon([(x + 330, 0), (x + 380, 0), (x - 20, H), (x - 70, H)], fill=(255, 255, 255, 200))
             img.alpha_composite(lay)
 def flash(img, t):
-    for tt, s in [(T_ONE + 0.5, 170)] + [(c + 0.05, 90) for c in T_P]:
+    for tt, s in [(T_ONE + 0.7, 170)] + [(c + 0.05, 90) for c in T_P]:
         dt = t - tt
         if 0 <= dt < 0.18: img.alpha_composite(Image.new("RGBA", (W, H), (255, 255, 255, int(s * (1 - dt / 0.18)))))
 
@@ -250,7 +249,7 @@ def frame(t):
     for p in P: player(lay, t, p)
     number_one(lay, t)
     dx = dy = 0
-    for tt, amp in [(c, 10) for c in T_P] + [(T_ONE + 0.5, 18)]:
+    for tt, amp in [(c, 10) for c in T_P] + [(T_ONE + 0.7, 18)]:
         d_ = t - tt
         if 0 <= d_ < 0.25: dx = math.sin(d_ * 90) * amp * (1 - d_ / 0.25); dy = math.cos(d_ * 70) * amp * (1 - d_ / 0.25)
     img.alpha_composite(lay, (int(dx), int(dy)))
